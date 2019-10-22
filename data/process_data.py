@@ -6,6 +6,15 @@ import os
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    loads the data from two dataset and merges them into one
+    Args:
+        messages_filepath: file path to the disaster_messages.csv file
+        categories_filepath: file path to the disaster_categories.csv
+
+    Returns:
+        Merged df
+    """
     cwd = os.getcwd()
     messages=pd.read_csv(os.path.join(cwd,messages_filepath))
     categories=pd.read_csv(os.path.join(cwd,categories_filepath))
@@ -22,6 +31,12 @@ def clean_data(df):
     convert column from string to numeric
     concatenate the original dataframe with the new `categories` dataframe
     drop duplicates
+
+    Args:
+        df: merged dataframe containing messages and respective categories
+
+    Returns:
+        Cleaned df
     """
     categories_cols = df['categories'].str.split(";",expand=True)
     row = categories_cols.iloc[0].to_list()
@@ -36,6 +51,17 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename, table_name):
+    """
+    Saves dataframe to sqlite db
+
+    Args:
+        df: cleaned dataframe
+        database_filename: name of db that the df should be stored to
+        table_name: name of the table in the db that data should be stored to
+
+    Returns:
+        None
+    """
     engine = create_engine(str('sqlite:///')+str(database_filename), encoding='UTF-8')
     df.to_sql(table_name, engine, index=False)
 
